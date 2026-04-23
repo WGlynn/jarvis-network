@@ -1,0 +1,27 @@
+{
+  "name": "jarvis-network",
+  "version": "0.1.0",
+  "description": "JARVIS Network — AI-native community infrastructure. Grounded, sharded, crypto-gated.",
+  "main": "src/index.js",
+  "type": "module",
+  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "start": "node --expose-gc --max-old-space-size=450 src/index.js",
+    "dev": "node --expose-gc --watch src/index.js",
+    "test": "node --test test/",
+    "lint": "node --check src/**/*.js",
+    "hash": "find src -name '*.js' -type f | sort | xargs sha256sum | sha256sum | awk '{print $1}'"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.4.7",
+    "ethers": "^6.16.0",
+    "simple-git": "^3.27.0",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

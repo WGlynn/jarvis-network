@@ -1,0 +1,81 @@
+# JARVIS Network — Docker Compose
+#
+# Usage:
+#   docker compose up -d          Start JARVIS (detached)
+#   docker compose logs -f        Watch logs
+#   docker compose down           Stop
+#   docker compose up -d --build  Rebuild and restart
+#
+# Inspired by vibeswap/jarvis-bot/docker-compose.yml.
+
+services:
+  jarvis:
+    build: .
+    container_name: jarvis-network
+    restart: unless-stopped
+    environment:
+      # Telegram
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_OWNER_ID=${TELEGRAM_OWNER_ID}
+      - BOT_USERNAME=${BOT_USERNAME:-}
+      - WEBHOOK_DOMAIN=${WEBHOOK_DOMAIN:-}
+      - PORT=${PORT:-8080}
+
+      # LLM providers (route across for cost efficiency)
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - LLM_PROVIDER=${LLM_PROVIDER:-anthropic}
+      - CLAUDE_MODEL=${CLAUDE_MODEL:-claude-haiku-4-5-20251001}
+
+      # Persona
+      - JARVIS_PERSONA=${JARVIS_PERSONA:-standard}
+
+      # Storage
+      - DATA_DIR=/app/data
+
+      # Archive mirror (optional)
+      - ARCHIVE_MIRROR_ENABLED=${ARCHIVE_MIRROR_ENABLED:-false}
+      - ARCHIVE_MIRROR_INTERVAL_MS=${ARCHIVE_MIRROR_INTERVAL_MS:-900000}
+
+      # Payment gate (v0.1)
+      - PAYMENT_USDC_ADDRESS=${PAYMENT_USDC_ADDRESS}
+      - PRICE_USDC_PER_MONTH=${PRICE_USDC_PER_MONTH:-29}
+      - GRANDFATHERED_CHAT_IDS=${GRANDFATHERED_CHAT_IDS:-}
+
+      # Metering / credits (v1)
+      - DATABASE_URL=${DATABASE_URL:-}
+
+      # TEE attestation (v3)
+      - TEE_PROVIDER=${TEE_PROVIDER:-}
+      - TEE_ATTESTATION_ENDPOINT=${TEE_ATTESTATION_ENDPOINT:-}
+
+      # Runtime
+      - NODE_ENV=production
+      - DOCKER=1
+
+    volumes:
+      - ./data:/app/data
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Postgres — activates with v1 (metering + credits ledger)
+  # Uncomment when v1 ships:
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: jarvis-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_DB: jarvis
+  #     POSTGRES_USER: ${POSTGRES_USER:-jarvis}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #   volumes:
+  #     - postgres-data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+
+# volumes:
+#   postgres-data:
+#     name: jarvis-postgres-data
