@@ -1,0 +1,56 @@
+PROPRIETARY SOFTWARE LICENSE
+
+Copyright (c) 2026 Will Glynn. All rights reserved.
+
+This software and associated documentation files (the "Software") are the
+proprietary property of Will Glynn and are protected by copyright law.
+
+The Software is provided under a closed-source, proprietary license during
+the bootstrap phase of the JARVIS Network. No part of the Software may be
+copied, modified, distributed, sublicensed, sold, or used as a component of
+any other product or service without the express prior written permission
+of the copyright holder.
+
+Beta access is granted on a per-customer basis under separate agreement.
+Beta access does not confer any rights to the underlying source code.
+
+---
+
+VERIFIABILITY COMMITMENT
+
+Closed-source does not mean opaque. The claims the Software makes about
+its own behavior — cost per message, grounding accuracy, architectural
+structure, absence of fabrication — will be cryptographically verifiable
+per the Verifiable Claims Roadmap in README.md. Verifiability ships in
+phases alongside the hosted tier.
+
+---
+
+FORWARD COMMITMENT TO SOURCE-AVAILABLE RELEASE
+
+This Software will transition to a source-available license under the
+following milestone conditions, whichever occurs first:
+
+(a) Monthly revenue from the hosted tier reaches or exceeds 2x monthly
+    infrastructure operating costs for three (3) consecutive months; or
+
+(b) Twelve (12) months have elapsed from the date of the first paying
+    customer.
+
+At that milestone, this license will be superseded by a source-available
+license permitting inspection, modification for self-hosting, and
+community contribution — with terms prohibiting (i) closed-source resale
+as a premium SaaS product and (ii) stripping of attribution.
+
+This forward commitment is binding and public. It may be accelerated but
+not deferred.
+
+---
+
+NO WARRANTY
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHOR BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING
+FROM THE USE OF THE SOFTWARE.

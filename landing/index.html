@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JARVIS — AI-native community infrastructure</title>
+  <meta name="description" content="AI bot infrastructure for crypto communities. ~100x cheaper than paid-API wrappers. Grounded in files, not tokens.">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 720px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #fafafa;
+    }
+    h1 {
+      font-size: 2.75rem;
+      margin-bottom: 0.25rem;
+      letter-spacing: -0.03em;
+      font-weight: 700;
+    }
+    h2 {
+      font-size: 1.4rem;
+      margin-top: 3rem;
+      letter-spacing: -0.01em;
+    }
+    .tagline {
+      color: #666;
+      margin-bottom: 2.5rem;
+      font-size: 1.1rem;
+    }
+    .hero {
+      font-size: 1.15rem;
+      margin: 2rem 0 3rem;
+      padding: 1.5rem;
+      background: #fff;
+      border-left: 3px solid #1a1a1a;
+    }
+    code {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      background: #eee;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+    .pillars {
+      list-style: none;
+      padding: 0;
+    }
+    .pillars li {
+      padding: 0.85rem 0;
+      border-top: 1px solid #ddd;
+    }
+    .pillars li:last-child { border-bottom: 1px solid #ddd; }
+    .pillars strong { color: #000; display: inline-block; min-width: 11rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.95rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+    th { background: #eee; font-weight: 600; }
+    .cta {
+      background: #1a1a1a;
+      color: #fafafa;
+      padding: 2rem;
+      border-radius: 6px;
+      margin: 3rem 0 2rem;
+      text-align: center;
+    }
+    .cta h2 {
+      color: #fafafa;
+      margin-top: 0;
+    }
+    .cta a {
+      color: #fafafa;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+    .footer {
+      color: #888;
+      font-size: 0.85rem;
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid #ddd;
+    }
+    .footer a { color: #666; }
+  </style>
+</head>
+<body>
+  <h1>JARVIS</h1>
+  <p class="tagline">AI-native community infrastructure — ~100× cheaper than paid-API wrappers.</p>
+
+  <div class="hero">
+    Every AI wrapper product pays for one giant model call, every time, with all context loaded. That's the economic model of the entire current AI tooling industry — and it's why those products cost $20–$200 per user per month. JARVIS doesn't.
+  </div>
+
+  <h2>Five architectural moves</h2>
+  <ul class="pillars">
+    <li><strong>Shard by function</strong> each call's prompt scoped to the current intent, not the whole bot state.</li>
+    <li><strong>Triage by cost</strong> every message hits a Haiku classifier first. Only ~15% merit the full model.</li>
+    <li><strong>Ground in files</strong> the LLM doesn't re-ingest chat history each turn. It queries ground truth via tool calls.</li>
+    <li><strong>Template deterministic output</strong> digests, stats, and structured output cost zero generated tokens.</li>
+    <li><strong>Route across providers</strong> cheapest adequate model per task. No lock-in to one expensive API.</li>
+  </ul>
+  <p>Same output quality. Architectural cost reduction, not feature reduction.</p>
+
+  <h2>Tiers</h2>
+  <table>
+    <thead>
+      <tr><th>Tier</th><th>Access</th><th>Payment</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Community Free</td><td>Hosted baseline (~1K msg/day)</td><td>None</td></tr>
+      <tr><td>Credit-Earning</td><td>Hosted + contributions earn bandwidth</td><td>Archive data / federated shards / modules</td></tr>
+      <tr><td>Crypto-Paid</td><td>Premium throughput, bigger-model routing, private deployments</td><td>USDC on Ethereum / Base / Arbitrum</td></tr>
+    </tbody>
+  </table>
+  <p>Lower tiers subsidized by upper. Excess surplus returns to contributors via Shapley-weighted distribution. No equity-holder extraction layer — surplus is a substrate property, not a margin.</p>
+
+  <h2>Verifiable claims</h2>
+  <p>Closed-source during bootstrap, but every architectural claim is cryptographically verifiable: binary hash commitment at launch, ZK proofs of cost-per-message from signed receipts, Merkle replay of archive-to-digest, TEE attestation for federated shards. Proof is the credibility mechanism. Source-available release ships at a publicly committed milestone.</p>
+
+  <div class="cta">
+    <h2>Beta access — invitation only</h2>
+    <p>Running a crypto community, DAO, or technical Telegram group? JARVIS is opening for its first cohort of hosted customers.</p>
+    <p><a href="mailto:TBD@jarvis.network">TBD@jarvis.network</a> &middot; <a href="https://t.me/TBD">@TBD</a></p>
+  </div>
+
+  <div class="footer">
+    <p>Closed-source beta. Source-available at milestone (see <code>LICENSE</code>). Part of the VibeSwap family of cryptographic-verification substrates.</p>
+  </div>
+</body>
+</html>
