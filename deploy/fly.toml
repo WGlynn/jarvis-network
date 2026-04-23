@@ -1,0 +1,57 @@
+# fly.toml — JARVIS Network deployment config for fly.io
+#
+# Setup (one-time):
+#   flyctl auth login
+#   flyctl apps create jarvis-network
+#   flyctl volumes create jarvis_data -a jarvis-network -r <region> --size 10
+#   flyctl secrets set -a jarvis-network TELEGRAM_BOT_TOKEN=... ANTHROPIC_API_KEY=... \
+#                                        TELEGRAM_OWNER_ID=... PAYMENT_USDC_ADDRESS=...
+#
+# Deploy:
+#   flyctl deploy -a jarvis-network --remote-only
+#
+# Or: trigger via .github/workflows/deploy.yml on push to master.
+
+app = "jarvis-network"
+primary_region = "ord"  # Chicago — low latency to most Telegram DCs; adjust per target audience
+
+[build]
+
+[env]
+  NODE_ENV = "production"
+  PORT = "8080"
+  DATA_DIR = "/app/data"
+  # Non-secret defaults — override via secrets or .env at deploy
+  LLM_PROVIDER = "anthropic"
+  CLAUDE_MODEL = "claude-haiku-4-5-20251001"
+  JARVIS_PERSONA = "standard"
+  PRICE_USDC_PER_MONTH = "29"
+  USDC_CONTRACT_BASE = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+  BASE_RPC_URL = "https://mainnet.base.org"
+
+[[mounts]]
+  source = "jarvis_data"
+  destination = "/app/data"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off"  # bot needs to stay up to poll Telegram
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "30s"
+    interval = "15s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1
+
+[deploy]
+  # Fly's health check will re-route traffic after the new machine is green.
+  strategy = "rolling"

@@ -47,7 +47,6 @@ jobs:
     name: Tests
     runs-on: ubuntu-latest
     needs: validate
-    if: false  # enable when test suite exists
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
