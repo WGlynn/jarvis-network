@@ -1,10 +1,11 @@
 // ============ JARVIS Network — Bot Entry Point ============
 //
-// v0.3: wired handler chain.
-//   - Onboarding + payment commands (always accessible)
+// v0.6 wired handler chain:
+//   - Onboarding + payment commands + /help (always accessible)
 //   - Admin commands (owner-only enforced in handlers)
 //   - Payment gate (silent-skips unpaid groups, passes DMs)
-//   - Main handler (Claude call with rolling context)
+//   - Paid-only query commands (/ask /summary /search /recent)
+//   - Main handler (archive + triage + Claude with rolling context)
 //   - Health server for fly.io
 // ============
 
@@ -20,6 +21,13 @@ import {
 } from './payment-gate.js';
 import { handlePaid } from './payment-listener.js';
 import { handleMessage } from './handler.js';
+import {
+  handleHelp,
+  handleAsk,
+  handleSummary,
+  handleSearch,
+  handleRecent,
+} from './commands.js';
 import { startHealthServer } from './health.js';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -30,26 +38,38 @@ if (!token) {
 
 const bot = new Telegraf(token);
 
-// ============ Onboarding + payment commands ============
-// Always accessible so unpaid groups can discover /subscribe.
+// ============ Pre-gate commands ============
+// Always accessible so unpaid groups can discover the product.
+bot.command('help', handleHelp);
 bot.command('subscribe', handleSubscribe);
 bot.command('status', handleStatus);
 bot.command('paid', handlePaid);
-
-// ============ Admin commands (owner-only enforced in handlers) ============
 bot.command('admin_credit', handleAdminCredit);
 bot.command('admin_revoke', handleAdminRevoke);
 bot.command('admin_list', handleAdminList);
 
 // ============ Payment gate ============
 // Silent-skips non-DM groups without active subscription.
-// Must run AFTER the commands above (so /subscribe works in unpaid groups).
 bot.use(gateMiddleware());
 
+// ============ Post-gate commands (paid chats only) ============
+bot.command('ask', handleAsk);
+bot.command('summary', handleSummary);
+bot.command('search', handleSearch);
+bot.command('recent', handleRecent);
+
 // ============ Main message handler ============
-// Only authorized chats reach here. Text messages get Claude-powered replies
-// with rolling per-chat context.
 bot.on('text', handleMessage);
+
+// Non-text messages (stickers, photos, voice, etc.) — archive-only for now.
+bot.on(['sticker', 'photo', 'video', 'voice', 'document'], async ctx => {
+  const { archiveFromContext } = await import('./archive.js');
+  try {
+    await archiveFromContext(ctx);
+  } catch (err) {
+    console.error('[index] non-text archive failed:', err.message);
+  }
+});
 
 // ============ Boot ============
 
