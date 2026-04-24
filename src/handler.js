@@ -1,16 +1,14 @@
 // ============ Main Message Handler ============
 //
-// v0.3: message in → Claude call → reply out, with rolling context.
-// Runs AFTER payment-gate middleware; only authorized chats reach this.
-//
-// System prompt is the JARVIS persona baseline. Full persona system from
-// vibeswap/jarvis-bot/src/persona.js merges here at bootstrap cut — this
-// stub uses a condensed version that captures voice without the full 16
-// structural rules.
+// v0.3: message in → Claude call → reply out, rolling in-memory context.
+// v0.4: archive every incoming message + bot reply. Context still in-memory
+//       for hot-path coherence; archive is ground truth for queries and
+//       future grounded tool calls.
 // ============
 
 import { chat, MODELS } from './claude-client.js';
 import { appendMessage, getContext } from './context.js';
+import { archiveFromContext, appendToArchive } from './archive.js';
 
 const SYSTEM_PROMPT = `You are JARVIS — an AI assistant embedded in a Telegram community. Crypto / tech / fintech context.
 
@@ -30,14 +28,22 @@ Behavior:
 Do not identify yourself as an AI language model, invent milestones that didn't happen, or retreat to generic safety phrases when pushed back on.`;
 
 export async function handleMessage(ctx) {
+  // Archive every incoming message (text + non-text). Ground-truth substrate.
+  try {
+    await archiveFromContext(ctx);
+  } catch (err) {
+    console.error('[handler] archive append failed:', err.message);
+    // Don't abort the reply path on archive errors.
+  }
+
   const text = ctx.message?.text?.trim();
-  if (!text) return; // non-text messages (stickers, media) — v0.6 adds typed handling
+  if (!text) return; // non-text: archived, no reply
   if (text.length < 3) return; // ultra-short noise skip
 
   const chatId = ctx.chat.id;
   const userName = ctx.from?.username || ctx.from?.first_name || 'user';
 
-  // Record incoming message in rolling context
+  // Record incoming message in rolling in-memory context (hot path).
   appendMessage(chatId, 'user', `[${userName}]: ${text}`);
 
   try {
@@ -51,13 +57,30 @@ export async function handleMessage(ctx) {
 
     if (!response.text) return;
 
-    // Record assistant reply in context so next turn has coherence
+    // Record assistant reply in context + archive.
     appendMessage(chatId, 'assistant', response.text);
+
+    // Archive the bot reply as its own record.
+    try {
+      await appendToArchive(chatId, {
+        message_id: null,
+        chat_id: chatId,
+        user_id: null,
+        username: 'jarvis',
+        first_name: 'JARVIS',
+        type: 'text',
+        text: response.text,
+        date: Math.floor(Date.now() / 1000),
+        bot_reply: true,
+        model_used: response.model,
+      });
+    } catch (err) {
+      console.error('[handler] reply archive failed:', err.message);
+    }
 
     await ctx.reply(response.text);
   } catch (err) {
     console.error('[handler] Claude call failed:', err.message);
-    // Silent skip on error — don't spam failures back to users
     return;
   }
 }
