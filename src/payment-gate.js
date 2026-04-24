@@ -100,7 +100,8 @@ export async function addCustomer(chatId, days, plan = 'monthly', notes = '') {
   const now = Date.now();
   const base = existing && existing.expires_at > now ? existing.expires_at : now;
   const expires_at = base + days * 24 * 60 * 60 * 1000;
-  customers[key] = { expires_at, plan, notes, updated_at: now };
+  // Renewal resets last_warning_threshold so the next cycle's warnings fire fresh.
+  customers[key] = { expires_at, plan, notes, updated_at: now, last_warning_threshold: null };
   await persist();
   return customers[key];
 }
@@ -109,6 +110,19 @@ export async function removeCustomer(chatId) {
   await ensureLoaded();
   delete customers[String(chatId)];
   await persist();
+}
+
+/**
+ * Merge metadata into an existing customer record. Used by the expiry watcher
+ * to track which warning thresholds have already fired.
+ */
+export async function setCustomerMeta(chatId, patch) {
+  await ensureLoaded();
+  const key = String(chatId);
+  if (!customers[key]) return null;
+  customers[key] = { ...customers[key], ...patch, updated_at: Date.now() };
+  await persist();
+  return customers[key];
 }
 
 export async function listCustomers() {

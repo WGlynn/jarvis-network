@@ -27,8 +27,10 @@ import {
   handleSummary,
   handleSearch,
   handleRecent,
+  handleAdminMetrics,
 } from './commands.js';
 import { startHealthServer } from './health.js';
+import { startExpiryWatcher } from './expiry-watch.js';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 if (!token) {
@@ -47,6 +49,7 @@ bot.command('paid', handlePaid);
 bot.command('admin_credit', handleAdminCredit);
 bot.command('admin_revoke', handleAdminRevoke);
 bot.command('admin_list', handleAdminList);
+bot.command('admin_metrics', handleAdminMetrics);
 
 // ============ Payment gate ============
 // Silent-skips non-DM groups without active subscription.
@@ -77,6 +80,7 @@ startHealthServer();
 
 bot.launch().then(() => {
   console.log('[jarvis-network] bot launched');
+  startExpiryWatcher(bot);
 });
 
 process.once('SIGINT', () => bot.stop('SIGINT'));

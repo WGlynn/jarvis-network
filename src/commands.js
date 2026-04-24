@@ -12,8 +12,14 @@
 //     trained-knowledge guessing.
 // ============
 
-import { chat, MODELS } from './claude-client.js';
+import { chat, MODELS, getUsage } from './claude-client.js';
 import { aggregateDay, searchArchive, readRecent } from './archive.js';
+import { listCustomers } from './payment-gate.js';
+
+const OWNER_USER_ID = parseInt(process.env.TELEGRAM_OWNER_ID || '0', 10);
+function isOwner(ctx) {
+  return ctx.from && ctx.from.id === OWNER_USER_ID;
+}
 
 function stripCommand(text, cmd) {
   return text.replace(new RegExp(`^\\/${cmd}(@\\w+)?\\s*`, 'i'), '').trim();
@@ -117,4 +123,41 @@ export async function handleRecent(ctx) {
     return `${who}: ${text}`;
   });
   return ctx.reply(`Last ${recent.length}:\n${lines.join('\n')}`);
+}
+
+// ============ /admin_metrics (owner only) ============
+
+export async function handleAdminMetrics(ctx) {
+  if (!isOwner(ctx)) return;
+
+  const customers = await listCustomers();
+  const now = Date.now();
+  const active = customers.filter(c => c.plan === 'grandfathered' || c.expires_at > now);
+  const paid = active.filter(c => c.plan !== 'grandfathered');
+  const expiring7 = paid.filter(c => {
+    const days = Math.floor((c.expires_at - now) / (24 * 60 * 60 * 1000));
+    return days >= 0 && days <= 7;
+  });
+
+  const usage = getUsage();
+  const totalIn = Object.values(usage).reduce((s, u) => s + u.in, 0);
+  const totalOut = Object.values(usage).reduce((s, u) => s + u.out, 0);
+  const totalCalls = Object.values(usage).reduce((s, u) => s + u.calls, 0);
+
+  const perProvider = Object.entries(usage)
+    .filter(([, u]) => u.calls > 0)
+    .map(([p, u]) => `  ${p}: ${u.calls} calls, ${u.in}in/${u.out}out`)
+    .join('\n') || '  (no calls yet this process)';
+
+  return ctx.reply(
+    `JARVIS Network — admin metrics\n\n` +
+      `Active subscriptions: ${active.length}\n` +
+      `  Paid: ${paid.length}\n` +
+      `  Grandfathered: ${active.length - paid.length}\n` +
+      `Expiring ≤7d: ${expiring7.length}\n\n` +
+      `Total customers ever: ${customers.length}\n\n` +
+      `LLM usage (this process):\n` +
+      `  Total: ${totalCalls} calls, ${totalIn}in / ${totalOut}out tokens\n` +
+      perProvider
+  );
 }
