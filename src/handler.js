@@ -1,14 +1,16 @@
 // ============ Main Message Handler ============
 //
 // v0.3: message in → Claude call → reply out, rolling in-memory context.
-// v0.4: archive every incoming message + bot reply. Context still in-memory
-//       for hot-path coherence; archive is ground truth for queries and
-//       future grounded tool calls.
+// v0.4: archive every message + bot reply; archive is ground truth.
+// v0.5: Haiku triage gates the full-model call — only engages when the
+//       reply earns the spend. Per-chat cooldown + hourly cap + mention
+//       bypass. Implements the core-pitch "15% merit the full model" claim.
 // ============
 
 import { chat, MODELS } from './claude-client.js';
 import { appendMessage, getContext } from './context.js';
 import { archiveFromContext, appendToArchive } from './archive.js';
+import { shouldEngage, recordEngage } from './triage.js';
 
 const SYSTEM_PROMPT = `You are JARVIS — an AI assistant embedded in a Telegram community. Crypto / tech / fintech context.
 
@@ -28,22 +30,29 @@ Behavior:
 Do not identify yourself as an AI language model, invent milestones that didn't happen, or retreat to generic safety phrases when pushed back on.`;
 
 export async function handleMessage(ctx) {
-  // Archive every incoming message (text + non-text). Ground-truth substrate.
+  // v0.4: archive every incoming message regardless of engagement decision.
   try {
     await archiveFromContext(ctx);
   } catch (err) {
     console.error('[handler] archive append failed:', err.message);
-    // Don't abort the reply path on archive errors.
   }
 
   const text = ctx.message?.text?.trim();
-  if (!text) return; // non-text: archived, no reply
-  if (text.length < 3) return; // ultra-short noise skip
+  if (!text) return;
 
   const chatId = ctx.chat.id;
   const userName = ctx.from?.username || ctx.from?.first_name || 'user';
 
-  // Record incoming message in rolling in-memory context (hot path).
+  // v0.5: Haiku-powered triage. Most messages observe; only ~15% engage.
+  const triage = await shouldEngage(text, { chatId });
+  if (!triage.engage) {
+    console.log(
+      `[handler] observe chat=${chatId}: ${triage.reason}` +
+        (triage.confidence != null ? ` (conf=${triage.confidence})` : '')
+    );
+    return;
+  }
+
   appendMessage(chatId, 'user', `[${userName}]: ${text}`);
 
   try {
@@ -57,10 +66,11 @@ export async function handleMessage(ctx) {
 
     if (!response.text) return;
 
-    // Record assistant reply in context + archive.
     appendMessage(chatId, 'assistant', response.text);
+    recordEngage(chatId);
 
-    // Archive the bot reply as its own record.
+    // Archive the bot reply as its own record (model_used + bot_reply flag
+    // feeds future v1 metering attribution).
     try {
       await appendToArchive(chatId, {
         message_id: null,

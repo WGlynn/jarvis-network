@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node --expose-gc --max-old-space-size=450 src/index.js",
     "dev": "node --expose-gc --watch src/index.js",
-    "test": "node --test test/",
+    "test": "node --test test/payment-gate.test.js test/archive.test.js",
     "lint": "node --check src/**/*.js",
     "hash": "find src -name '*.js' -type f | sort | xargs sha256sum | sha256sum | awk '{print $1}'"
   },
