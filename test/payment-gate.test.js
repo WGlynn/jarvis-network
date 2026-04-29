@@ -22,6 +22,9 @@ describe('payment-gate', () => {
     process.env.GRANDFATHERED_CHAT_IDS = '-1000000000000';
     process.env.PAYMENT_USDC_ADDRESS = '0xabc';
     process.env.PRICE_USDC_PER_MONTH = '29';
+    // v0.9.2: OPEN_ACCESS defaults to true in production. These tests verify
+    // paywall behavior, so explicitly disable open-access mode for the suite.
+    process.env.OPEN_ACCESS = 'false';
     // Import AFTER env is set — module captures env at import time.
     gate = await import('../src/payment-gate.js');
   });
