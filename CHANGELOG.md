@@ -6,6 +6,15 @@ Format: subject line from git commit + one-sentence summary + concrete change li
 
 ---
 
+## v0.9.1 — Standard persona hardening (2026-04-29)
+
+Strengthened the `standard` persona system prompt with explicit anti-patterns observed in the wild — the bot was producing third-person narration ("it sounds like you're exploring..."), generic-AI sycophancy ("thank you for your kindness", "beautiful sentiment"), context bleeds (a "cattooo" hallucination from elsewhere), and zero-substance acknowledgments of named technical concepts (Muon, mHC, V4 dropped without engagement).
+
+- `src/personas.js` — `standard` persona now includes: (1) anti-narration rule — no third-person, no "it sounds like"; (2) expanded sycophancy ban covering "thank you for your X" patterns; (3) no generic affirmations ("beautiful sentiment", "I appreciate the thought"); (4) context-isolation rule — no inserting names/emojis/words from outside the current chat; (5) first-person grounding; (6) technical-engagement-required — when a named technical reference appears, engage with it specifically or admit not knowing; (7) ban on meaningless-filler responses like "I'm excited to learn more"
+- No interface changes; persona swap is in-place
+
+Trigger: 2026-04-29 Tadija Telegram exchange where the bot produced all the above failure modes simultaneously while running on OpenRouter free-tier (Llama 3.2 3B per default). Substrate floor matters too — recommend deployment env: `LLM_PROVIDER=anthropic` + `CLAUDE_MODEL=claude-haiku-4-5-20251001` (or `claude-sonnet-4-6` for technical-heavy chats).
+
 ## v0.9 — Personas (2026-04-23)
 
 Four persona modes: standard / degen / analyst / sensei. Operator picks via `JARVIS_PERSONA` env.
