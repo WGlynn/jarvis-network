@@ -41,6 +41,13 @@ const GRANDFATHERED_CHAT_IDS = (process.env.GRANDFATHERED_CHAT_IDS || '')
 const PAYMENT_ADDRESS = process.env.PAYMENT_USDC_ADDRESS || '<set PAYMENT_USDC_ADDRESS>';
 const PRICE_PER_MONTH = process.env.PRICE_USDC_PER_MONTH || '29';
 
+// v0.9.2: open-access mode — bot replies in any group chat regardless of
+// subscription state. Default true to make access permissive by default;
+// set OPEN_ACCESS=false to re-enable the paywall. Subscription / status /
+// admin commands still work for those who want to support; the gate just
+// doesn't block message processing anymore.
+const OPEN_ACCESS = (process.env.OPEN_ACCESS ?? 'true').toLowerCase() !== 'false';
+
 let customers = {};
 let loaded = false;
 
@@ -239,6 +246,7 @@ export function gateMiddleware() {
     const chatType = ctx.chat?.type;
     if (chatType === 'private') return next();
     if (!ctx.chat?.id) return next();
+    if (OPEN_ACCESS) return next(); // v0.9.2: paywall lifted; subscription commands still work for opt-in support
     const authorized = await isAuthorized(ctx.chat.id);
     if (authorized) return next();
     return; // silent skip — no next() call

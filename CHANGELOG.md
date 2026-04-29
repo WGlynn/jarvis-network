@@ -6,6 +6,14 @@ Format: subject line from git commit + one-sentence summary + concrete change li
 
 ---
 
+## v0.9.2 — Open access by default (2026-04-29)
+
+The bot was previously gated by subscription (USDC on Base, /admin_credit). After successful scale validation, dropping the paywall to make access permissive — anyone in any group chat the bot is in can now interact, regardless of subscription state. Subscription commands (/subscribe, /status, /admin_credit, /admin_revoke, /admin_list) still work for those who want to support; the gate just doesn't block message processing anymore.
+
+- `src/payment-gate.js` — added `OPEN_ACCESS` env var (defaults to `true`); `gateMiddleware()` short-circuits to `next()` when open-access is on. All other subscription / admin / expiry logic untouched. Set `OPEN_ACCESS=false` to re-enable the paywall.
+
+Note: triage-layer rate limits (cooldown / hourly cap / engage threshold) are UNTOUCHED. Those are the cost-control mechanism that makes scaling work — removing them would explode API spend. Open access raises the user-count ceiling; triage keeps per-message cost bounded. Two distinct knobs.
+
 ## v0.9.1 — Standard persona hardening (2026-04-29)
 
 Strengthened the `standard` persona system prompt with explicit anti-patterns observed in the wild — the bot was producing third-person narration ("it sounds like you're exploring..."), generic-AI sycophancy ("thank you for your kindness", "beautiful sentiment"), context bleeds (a "cattooo" hallucination from elsewhere), and zero-substance acknowledgments of named technical concepts (Muon, mHC, V4 dropped without engagement).
