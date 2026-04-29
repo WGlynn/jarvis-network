@@ -44,7 +44,11 @@ export async function handleMessage(ctx) {
       system: getSystemPrompt(),
       messages: getContext(chatId),
       model: MODELS.default,
-      maxTokens: 512,
+      // v0.9.3: 512 was truncating substantive answers mid-sentence (observed
+      // 2026-04-29 with Tadija's hormonal-loops question). 1500 covers
+      // technical replies without runaway. Per-call cost up ~3x but only when
+      // the full answer needs the room; short responses still cost the same.
+      maxTokens: 1500,
       temperature: 0.7,
     });
 

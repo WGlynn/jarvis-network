@@ -6,6 +6,12 @@ Format: subject line from git commit + one-sentence summary + concrete change li
 
 ---
 
+## v0.9.3 — Bump maxTokens for substantive answers (2026-04-29)
+
+Observed 2026-04-29 in production: bot truncating mid-sentence on Tadija's hormonal-loops question ("That's a solid observation, tadija. You're describing a system" — stopped at the token ceiling). Earlier reply also clipped ("more opportunity for real" — fragment ending). Both at 512-token cap.
+
+- `src/handler.js` — `maxTokens` bumped 512 → 1500. Per-call cost rises proportionally only when the full reply needs the room; short replies still cost the same. Substantive technical engagement requires the headroom.
+
 ## v0.9.2 — Open access by default (2026-04-29)
 
 The bot was previously gated by subscription (USDC on Base, /admin_credit). After successful scale validation, dropping the paywall to make access permissive — anyone in any group chat the bot is in can now interact, regardless of subscription state. Subscription commands (/subscribe, /status, /admin_credit, /admin_revoke, /admin_list) still work for those who want to support; the gate just doesn't block message processing anymore.
