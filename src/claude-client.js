@@ -49,6 +49,16 @@ export const MODELS = {
   ollama: OLLAMA_DEFAULT_MODEL,
 };
 
+// Anthropic-API model IDs are bare slugs like "claude-haiku-4-5-20251001".
+// OpenRouter (and other OpenAI-compat providers) use prefixed slugs like
+// "anthropic/claude-haiku-4.5" or "meta-llama/llama-3.2-3b-instruct:free".
+// Caller-passed model strings that match the Anthropic-API shape are not
+// valid on those providers and must be ignored in favor of the provider's
+// configured default.
+function looksLikeAnthropicModelId(s) {
+  return typeof s === 'string' && /^claude-[a-z0-9-]+$/i.test(s);
+}
+
 // ============ Public interface ============
 
 /**
@@ -68,10 +78,19 @@ export async function chat({
       if (PROVIDER === 'anthropic') {
         return await callAnthropic({ system, messages, model, maxTokens, temperature });
       } else if (PROVIDER === 'openrouter') {
+        // Callers often pass Anthropic-API model IDs (e.g. MODELS.haiku =
+        // 'claude-haiku-4-5-20251001') that are not valid on OpenRouter,
+        // which uses prefixed slugs (e.g. anthropic/claude-haiku-4.5).
+        // When provider is openrouter, strip such IDs and fall through
+        // to OPENROUTER_DEFAULT_MODEL so the dispatch always sends a
+        // model the provider understands.
+        const orModel = (model && !looksLikeAnthropicModelId(model))
+          ? model
+          : OPENROUTER_DEFAULT_MODEL;
         return await callOpenAICompat({
           system,
           messages,
-          model: model || OPENROUTER_DEFAULT_MODEL,
+          model: orModel,
           maxTokens,
           temperature,
           base: OPENROUTER_BASE,
@@ -79,10 +98,13 @@ export async function chat({
           providerTag: 'openrouter',
         });
       } else if (PROVIDER === 'ollama') {
+        const ollamaModel = (model && !looksLikeAnthropicModelId(model))
+          ? model
+          : OLLAMA_DEFAULT_MODEL;
         return await callOpenAICompat({
           system,
           messages,
-          model: model || OLLAMA_DEFAULT_MODEL,
+          model: ollamaModel,
           maxTokens,
           temperature,
           base: OLLAMA_BASE,
