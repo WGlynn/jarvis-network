@@ -63,38 +63,6 @@ See [`LICENSE`](./LICENSE) for full terms.
 
 ---
 
-## Verifiable Claims Roadmap
-
-Closed-source beta doesn't mean opaque claims. Every architectural claim JARVIS makes is cryptographically verifiable, shipped per phase.
-
-### v0 — Commitment (ships with launch)
-
-- **Binary hash commitment** — public git tag + SHA-256 hash of the running binary at first customer onboarding. Future reveals prove no backsliding.
-- **Architecture claim commitment** — the claims in this README (sharding, Haiku triage, templates, multi-provider routing) are binding. Hash committed; deviations detectable.
-
-### v1 — Cost transparency (ships with first paying customer)
-
-- **Monthly cost-per-message proof** — ZK proof from signed LLM-provider receipts + message counter. "~100x cheaper than [competitor]" becomes a verifiable claim, not a pitch line.
-- **Cadence**: monthly, published on-chain or via Merkle-root commit.
-
-### v2 — Grounding proofs (ships with hosted tier)
-
-- **Archive-to-digest replay** — every digest ships with a Merkle proof from archive state to output. Replay is deterministic; mismatch = fabrication detected.
-- **Archive integrity** — Merkle root of archive state committed daily.
-
-### v3 — Full attestation (ships with federated shards)
-
-- **TEE attestation for hosted shards** — Intel SGX / AMD SEV-SNP / AWS Nitro attestation that the running binary matches the committed hash.
-- **Federated shards attest** before accepting credit-earning traffic. Shards that fail attestation don't route.
-
-### Principle
-
-Proof is the primary credibility mechanism during closed-source phase. The source-available milestone in [`LICENSE`](./LICENSE) stays committed, but verifiability shipping earlier means customers don't wait for OSS to audit the claims — they audit the proofs.
-
-This is the same substrate VibeSwap operates on. Commit-reveal for auctions. Shapley proofs for attribution. ZK + TEE for JARVIS. Sibling moves, same cryptographic-verification thesis.
-
----
-
 ## Why closed-source during bootstrap
 
 Shipping the architecture OSS-first without VC or treasury backing means well-funded clones can launch the same service within a week, drain our infrastructure runway before the circular economy reaches escape velocity, and capture the market before the hosted tier has paying customers. The closed-source beta is the bootstrap mechanism — not the end state. The milestone commitment above is how we keep the propagation thesis intact while funding ourselves into position to deliver it.
