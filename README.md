@@ -49,7 +49,7 @@ OSS self-host is **not** currently a tier. See License below for the forward com
 
 ## Access
 
-Beta is invitation-only during bootstrap phase. Email `TBD` or reach out via Telegram for access.
+Beta is invitation-only during bootstrap phase. Reach out via Telegram for access: [t.me/+3uHbNxyZH-tiOGY8](https://t.me/+3uHbNxyZH-tiOGY8)
 
 ---
 
@@ -103,4 +103,4 @@ Shipping the architecture OSS-first without VC or treasury backing means well-fu
 
 ## Contact
 
-`TBD` — filled in on first public launch.
+Telegram: [t.me/+3uHbNxyZH-tiOGY8](https://t.me/+3uHbNxyZH-tiOGY8)
