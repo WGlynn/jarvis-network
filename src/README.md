@@ -1,6 +1,6 @@
 # src/
 
-Codebase lives in `vibeswap/jarvis-bot/src/` in the private VibeSwap repo. It will be copied here before first customer onboarding.
+Codebase lives in `vibeswap/jarvis-bot/src/` in the [VibeSwap monorepo](https://github.com/WGlynn/VibeSwap). It will be copied here before first customer onboarding.
 
 Kept empty at scaffold stage to avoid duplicating an active codebase. The structure the repo WILL hold is documented in `ARCHITECTURE.md` (and `vibeswap/jarvis-bot/docs/JARVIS_2.0.md`).
 

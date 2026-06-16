@@ -16,9 +16,9 @@ Minimum viable deployment for first beta customers.
 
 ### Quick start
 
-1. Clone the private repo (coordinate access with operator):
+1. Clone the repo:
    ```bash
-   git clone <repo-url> jarvis
+   git clone https://github.com/WGlynn/jarvis-network.git jarvis
    cd jarvis
    ```
 2. Copy env template:
